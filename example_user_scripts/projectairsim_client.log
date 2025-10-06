@@ -1,0 +1,17 @@
+15:10:03:174 [INFO] Connecting to simulation server at 127.0.0.1
+15:10:03:177 [ERROR] Exception occurred: Connection refused
+Traceback (most recent call last):
+  File "hello_drone.py", line 25, in main
+    client.connect()
+  File "/workspace/projectairsim/src/projectairsim/client.py", line 73, in connect
+    self.socket_topics.dial(
+  File "/usr/local/lib/python3.8/site-packages/pynng/nng.py", line 388, in dial
+    return self._dial(address, flags=0)
+  File "/usr/local/lib/python3.8/site-packages/pynng/nng.py", line 407, in _dial
+    check_err(ret)
+  File "/usr/local/lib/python3.8/site-packages/pynng/exceptions.py", line 202, in check_err
+    raise exc(string, err)
+pynng.exceptions.ConnectionRefused: Connection refused
+15:10:03:178 [INFO] Disconnecting from simulation server...
+15:10:04:180 [WARNING] Timed out while trying to unsubscribe from all topics.
+15:10:04:180 [INFO] Disconnected.
