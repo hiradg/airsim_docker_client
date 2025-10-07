@@ -12,16 +12,25 @@ if [[ "${PROJECTAIRSIM_EDITABLE_INSTALL:-1}" != "0" && -d /workspace/projectairs
 fi
 
 # Resolve the IP address of the Windows host when PROJECTAIRSIM_HOST is set
-# to "auto" (the default). In WSL2 the Windows host is reachable through the
-# first DNS entry listed in /etc/resolv.conf. Fallback to host.docker.internal
-# when the lookup fails so the user can still override it manually.
+# to "auto" (the default). Prefer the WSL gateway returned by `ip route` and
+# fall back to the first DNS entry in /etc/resolv.conf or host.docker.internal
+# when discovery fails so the user can still override it manually.
 if [[ "${PROJECTAIRSIM_HOST:-auto}" == "auto" ]]; then
-    gateway_ip=$(awk '/nameserver/ {print $2; exit}' /etc/resolv.conf || true)
-    if [[ -n "${gateway_ip}" ]]; then
-        export PROJECTAIRSIM_HOST="${gateway_ip}"
-    else
-        export PROJECTAIRSIM_HOST="host.docker.internal"
+    gateway_ip=""
+
+    if command -v ip >/dev/null 2>&1; then
+        gateway_ip=$(ip route show | awk '/^default/ {print $3; exit}' || true)
     fi
+
+    if [[ -z "${gateway_ip}" ]]; then
+        gateway_ip=$(awk '/nameserver/ {print $2; exit}' /etc/resolv.conf || true)
+    fi
+
+    if [[ -z "${gateway_ip}" ]]; then
+        gateway_ip="host.docker.internal"
+    fi
+
+    export PROJECTAIRSIM_HOST="${gateway_ip}"
 fi
 
 exec "$@"

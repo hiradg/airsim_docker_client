@@ -39,8 +39,9 @@ python example_user_scripts/hello_drone.py
 ### Host connectivity
 
 The `entrypoint.sh` script resolves the Windows host IP automatically using the
-gateway defined in `/etc/resolv.conf`. When necessary you can override the host
-IP and ports in the shell before launching the container:
+default gateway exposed by `ip route` (with fallbacks to `/etc/resolv.conf` and
+`host.docker.internal`). When necessary you can override the host IP and ports
+in the shell before launching the container:
 
 ```bash
 export PROJECTAIRSIM_HOST=192.168.0.10
