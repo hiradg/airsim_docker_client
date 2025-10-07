@@ -4,21 +4,53 @@ Copyright (C) 2025 IAMAI CONSULTING CORP
 MIT License.
 
 Demonstrates flying a quadrotor drone with camera sensors.
+
+Usage:
+    python hello_drone.py [--address ADDRESS] [--port-topics PORT] [--port-services PORT]
+
+Examples:
+    # Run with default connection (127.0.0.1:8989:8990)
+    python hello_drone.py
+
+    # Connect to a specific address and ports
+    python hello_drone.py --address 192.168.1.100 --port-topics 9000 --port-services 9001
+
+    # Show help
+    python hello_drone.py --help
 """
 
 import asyncio
+import argparse
 
 from projectairsim import ProjectAirSimClient, Drone, World
 from projectairsim.utils import projectairsim_log
 from projectairsim.image_utils import ImageDisplay
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='ProjectAirSim Drone Demo')
+    parser.add_argument('--address', type=str, default='127.0.0.1',
+                      help='Address of the AirSim server (default: 127.0.0.1)')
+    parser.add_argument('--port-topics', type=int, default=8989,
+                      help='Port for topics (default: 8989)')
+    parser.add_argument('--port-services', type=int, default=8990,
+                      help='Port for services (default: 8990)')
+    return parser.parse_args()
+
 # Async main function to wrap async drone commands
 async def main():
-    # Create a Project AirSim client
-    client = ProjectAirSimClient()
+    # Parse command line arguments
+    args = parse_args()
+    
+    # Create a Project AirSim client with command line arguments
+    client = ProjectAirSimClient(
+        address=args.address,
+        port_topics=args.port_topics,
+        port_services=args.port_services
+    )
 
     # Initialize an ImageDisplay object to display camera sub-windows
     image_display = ImageDisplay()
+
 
     try:
         # Connect to simulation environment
@@ -32,30 +64,30 @@ async def main():
 
         # ------------------------------------------------------------------------------
 
-        # Subscribe to chase camera sensor as a client-side pop-up window
-        chase_cam_window = "ChaseCam"
-        image_display.add_chase_cam(chase_cam_window)
-        client.subscribe(
-            drone.sensors["Chase"]["scene_camera"],
-            lambda _, chase: image_display.receive(chase, chase_cam_window),
-        )
+        # # Subscribe to chase camera sensor as a client-side pop-up window
+        # chase_cam_window = "ChaseCam"
+        # image_display.add_chase_cam(chase_cam_window)
+        # client.subscribe(
+        #     drone.sensors["Chase"]["scene_camera"],
+        #     lambda _, chase: image_display.receive(chase, chase_cam_window),
+        # )
 
-        # Subscribe to the downward-facing camera sensor's RGB and Depth images
-        rgb_name = "RGB-Image"
-        image_display.add_image(rgb_name, subwin_idx=0)
-        client.subscribe(
-            drone.sensors["DownCamera"]["scene_camera"],
-            lambda _, rgb: image_display.receive(rgb, rgb_name),
-        )
+        # # Subscribe to the downward-facing camera sensor's RGB and Depth images
+        # rgb_name = "RGB-Image"
+        # image_display.add_image(rgb_name, subwin_idx=0)
+        # client.subscribe(
+        #     drone.sensors["DownCamera"]["scene_camera"],
+        #     lambda _, rgb: image_display.receive(rgb, rgb_name),
+        # )
 
-        depth_name = "Depth-Image"
-        image_display.add_image(depth_name, subwin_idx=2)
-        client.subscribe(
-            drone.sensors["DownCamera"]["depth_camera"],
-            lambda _, depth: image_display.receive(depth, depth_name),
-        )
+        # depth_name = "Depth-Image"
+        # image_display.add_image(depth_name, subwin_idx=2)
+        # client.subscribe(
+        #     drone.sensors["DownCamera"]["depth_camera"],
+        #     lambda _, depth: image_display.receive(depth, depth_name),
+        # )
 
-        image_display.start()
+        # image_display.start()
 
         # ------------------------------------------------------------------------------
 

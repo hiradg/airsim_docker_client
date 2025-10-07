@@ -13,7 +13,6 @@ import cryptography.hazmat.primitives.asymmetric.padding
 import cryptography.hazmat.primitives.hashes
 import inspect
 import json
-import os
 import random
 import threading
 import time
@@ -31,31 +30,6 @@ from projectairsim.utils import projectairsim_log
 
 class ProjectAirSimClient:
     def __init__(self, address="127.0.0.1", port_topics=8989, port_services=8990):
-        env_address = os.environ.get("PROJECTAIRSIM_HOST")
-        env_port_topics = os.environ.get("PROJECTAIRSIM_PORT_TOPICS")
-        env_port_services = os.environ.get("PROJECTAIRSIM_PORT_SERVICES")
-
-        if env_address:
-            address = env_address
-        if env_port_topics:
-            try:
-                port_topics = int(env_port_topics)
-            except ValueError:
-                utils.projectairsim_log().warning(
-                    "Invalid PROJECTAIRSIM_PORT_TOPICS value '%s', using default %s",
-                    env_port_topics,
-                    port_topics,
-                )
-        if env_port_services:
-            try:
-                port_services = int(env_port_services)
-            except ValueError:
-                utils.projectairsim_log().warning(
-                    "Invalid PROJECTAIRSIM_PORT_SERVICES value '%s', using default %s",
-                    env_port_services,
-                    port_services,
-                )
-
         self.topics = {}
         self.subs = {}
         self.recv_topic_thread = None
